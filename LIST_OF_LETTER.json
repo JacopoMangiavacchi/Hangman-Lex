@@ -1,0 +1,88 @@
+{
+    "enumerationValues": [
+        {
+            "value": "a"
+        }, 
+        {
+            "value": "b"
+        }, 
+        {
+            "value": "c"
+        }, 
+        {
+            "value": "d"
+        }, 
+        {
+            "value": "e"
+        }, 
+        {
+            "value": "f"
+        }, 
+        {
+            "value": "g"
+        }, 
+        {
+            "value": "h"
+        }, 
+        {
+            "value": "i"
+        }, 
+        {
+            "value": "j"
+        }, 
+        {
+            "value": "k"
+        }, 
+        {
+            "value": "l"
+        }, 
+        {
+            "value": "m"
+        }, 
+        {
+            "value": "n"
+        }, 
+        {
+            "value": "o"
+        }, 
+        {
+            "value": "p"
+        }, 
+        {
+            "value": "q"
+        }, 
+        {
+            "value": "r"
+        }, 
+        {
+            "value": "s"
+        }, 
+        {
+            "value": "t"
+        }, 
+        {
+            "value": "u"
+        }, 
+        {
+            "value": "v"
+        }, 
+        {
+            "value": "w"
+        }, 
+        {
+            "value": "x"
+        }, 
+        {
+            "value": "y"
+        }, 
+        {
+            "value": "z"
+        }
+    ], 
+    "name": "LIST_OF_LETTER", 
+    "checksum": "c8ba6b8c-c927-4686-bb38-16090f065301", 
+    "version": "$LATEST", 
+    "lastUpdatedDate": 1496934219.106, 
+    "createdDate": 1494416051.775, 
+    "description": "Available letters"
+}

@@ -1,0 +1,27 @@
+{
+    "name": "Point", 
+    "checksum": "03c856fc-c8b3-4ba0-9a30-4b60ca6922b5", 
+    "version": "$LATEST", 
+    "lastUpdatedDate": 1497905807.998, 
+    "createdDate": 1497905600.057, 
+    "sampleUtterances": [
+        "tell me the discovered letter", 
+        "discovered letters", 
+        "what are the discovered letters", 
+        "what I found", 
+        "what I tried", 
+        "how close am I", 
+        "how close", 
+        "am I hanging", 
+        "tell me more", 
+        "tell me what I discovered"
+    ], 
+    "slots": [], 
+    "fulfillmentActivity": {
+        "type": "CodeHook", 
+        "codeHook": {
+            "uri": "arn:aws:lambda:us-east-1:316057523961:function:Hangman", 
+            "messageVersion": "1.0"
+        }
+    }
+}

@@ -1,13 +1,16 @@
 {
     "name": "TryLetter", 
-    "checksum": "69848fbc-e85d-4608-83bd-e92817e48cc5", 
+    "checksum": "a7d370af-135a-405b-9014-e611fe19ea7d", 
     "version": "$LATEST", 
-    "lastUpdatedDate": 1496936496.414, 
+    "lastUpdatedDate": 1497905970.044, 
     "createdDate": 1494415909.443, 
     "sampleUtterances": [
         "try {letter}", 
         "try letter {letter}", 
-        "try"
+        "try", 
+        "does it contain {letter}", 
+        "letter {letter}", 
+        "try with {letter}"
     ], 
     "slots": [
         {
@@ -24,7 +27,7 @@
                 ]
             }, 
             "priority": 1, 
-            "slotTypeVersion": "3", 
+            "slotTypeVersion": "4", 
             "sampleUtterances": []
         }
     ], 

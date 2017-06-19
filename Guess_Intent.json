@@ -1,0 +1,69 @@
+{
+    "confirmationPrompt": {
+        "maxAttempts": 3, 
+        "messages": [
+            {
+                "content": "Is the word you want to guess {word}", 
+                "contentType": "PlainText"
+            }, 
+            {
+                "content": "Do you want to guess the word {word}", 
+                "contentType": "PlainText"
+            }
+        ]
+    }, 
+    "name": "Guess", 
+    "checksum": "027a8292-ea83-477a-a03c-26a6c4b5fff0", 
+    "version": "$LATEST", 
+    "rejectionStatement": {
+        "messages": [
+            {
+                "content": "Ok, try to guess a letter now", 
+                "contentType": "PlainText"
+            }
+        ]
+    }, 
+    "createdDate": 1497902082.268, 
+    "lastUpdatedDate": 1497905564.97, 
+    "sampleUtterances": [
+        "I guess the word is {word}", 
+        "Try the word {word}", 
+        "Can I guess", 
+        "Can I guess the {word}", 
+        "I want to guess the {word}", 
+        "Is this {word}", 
+        "Is the secret word {word}", 
+        "is the word {word}"
+    ], 
+    "slots": [
+        {
+            "slotType": "LIST_OF_LETTER", 
+            "name": "word", 
+            "slotConstraint": "Required", 
+            "valueElicitationPrompt": {
+                "maxAttempts": 2, 
+                "messages": [
+                    {
+                        "content": "What is the word?", 
+                        "contentType": "PlainText"
+                    }, 
+                    {
+                        "content": "What word you want to try", 
+                        "contentType": "PlainText"
+                    }
+                ], 
+                "responseCard": "{\"version\":1,\"contentType\":\"application/vnd.amazonaws.card.generic\",\"genericAttachments\":[{\"buttons\":[]}]}"
+            }, 
+            "priority": 1, 
+            "slotTypeVersion": "4", 
+            "sampleUtterances": []
+        }
+    ], 
+    "fulfillmentActivity": {
+        "type": "CodeHook", 
+        "codeHook": {
+            "uri": "arn:aws:lambda:us-east-1:316057523961:function:Hangman", 
+            "messageVersion": "1.0"
+        }
+    }
+}

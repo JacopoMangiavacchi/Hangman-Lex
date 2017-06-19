@@ -2,13 +2,29 @@
     "status": "READY", 
     "intents": [
         {
-            "intentVersion": "11", 
+            "intentVersion": "1", 
+            "intentName": "Explain"
+        }, 
+        {
+            "intentVersion": "1", 
+            "intentName": "Guess"
+        }, 
+        {
+            "intentVersion": "14", 
             "intentName": "TryLetter"
+        }, 
+        {
+            "intentVersion": "1", 
+            "intentName": "Point"
+        }, 
+        {
+            "intentVersion": "1", 
+            "intentName": "Surrender"
         }
     ], 
     "name": "Hangman", 
     "locale": "en-US", 
-    "checksum": "babeceec-0701-4e74-95aa-6462c78f1d80", 
+    "checksum": "719890ff-f7ef-492a-b99b-06b8661f8bdb", 
     "abortStatement": {
         "messages": [
             {
@@ -18,7 +34,7 @@
         ]
     }, 
     "version": "$LATEST", 
-    "lastUpdatedDate": 1496936527.898, 
+    "lastUpdatedDate": 1497906017.919, 
     "createdDate": 1494415752.404, 
     "clarificationPrompt": {
         "maxAttempts": 5, 

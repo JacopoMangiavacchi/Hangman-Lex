@@ -1,0 +1,23 @@
+{
+    "name": "Explain", 
+    "checksum": "417a6cd3-174d-40d4-99df-0ac35b65fbff", 
+    "version": "$LATEST", 
+    "lastUpdatedDate": 1497905807.613, 
+    "createdDate": 1497901976.051, 
+    "sampleUtterances": [
+        "explain", 
+        "please explain", 
+        "what is the meaning", 
+        "what does it mean", 
+        "tell me about the word", 
+        "tell me more about the word"
+    ], 
+    "slots": [], 
+    "fulfillmentActivity": {
+        "type": "CodeHook", 
+        "codeHook": {
+            "uri": "arn:aws:lambda:us-east-1:316057523961:function:Hangman", 
+            "messageVersion": "1.0"
+        }
+    }
+}

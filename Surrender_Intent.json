@@ -1,0 +1,24 @@
+{
+    "name": "Surrender", 
+    "checksum": "c4620a25-ba94-4fc3-abcd-6546a643df91", 
+    "version": "$LATEST", 
+    "lastUpdatedDate": 1497905808.006, 
+    "createdDate": 1497905731.199, 
+    "sampleUtterances": [
+        "Restart", 
+        "Start a new game", 
+        "New game", 
+        "Play a new game", 
+        "I quit", 
+        "I surrend", 
+        "I give up"
+    ], 
+    "slots": [], 
+    "fulfillmentActivity": {
+        "type": "CodeHook", 
+        "codeHook": {
+            "uri": "arn:aws:lambda:us-east-1:316057523961:function:Hangman", 
+            "messageVersion": "1.0"
+        }
+    }
+}

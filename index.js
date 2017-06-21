@@ -11,16 +11,27 @@ function close(sessionAttributes, fulfillmentState, message) {
 }
 // --------------- Events -----------------------
 function dispatch(intentRequest, callback) {
-    console.log('request received for userId=${intentRequest.userId}, intentName=${intentRequest.currentIntent.intentName}');
+    console.log(`request received for userId=${intentRequest.userId}, intentName=${intentRequest.currentIntent.name}`);
+
     const sessionAttributes = intentRequest.sessionAttributes;
     const slots = intentRequest.currentIntent.slots;
+    const intent = intentRequest.currentIntent.name
     
-    if (slots.letter === undefined || slots.letter.length === 0) {
-        callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a letter (${slots.letter}) !`}));
-    }   
-    else {
-        const letter = slots.letter.toLowerCase().substr(0, 1);
-        callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the letter ${letter} (${slots.letter})!`}));
+    switch (intent) {
+        case "TryLetter":
+            if (slots.letter === undefined || slots.letter.length === 0) {
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a letter (${slots.letter}) !`}));
+            }   
+            else {
+                const letter = slots.letter.toLowerCase().substr(0, 1);
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the letter ${letter} (${slots.letter})!`}));
+            }
+            break;
+    
+        default:
+            console.log(`wrong intent - ${intent}`)
+            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Wrong intent`}));
+            break;
     }
 }
 // --------------- Main handler -----------------------

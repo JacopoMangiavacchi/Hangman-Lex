@@ -1,4 +1,14 @@
+
+// Lex Hangman Bot
+
+// Jacopo Mangiavacchi.
+
 'use strict';
+
+var HangmanGame = require("./HangmanGame");
+
+var maxNumberOfTry = 9;
+
 // Close dialog with the customer, reporting fulfillmentState of Failed or Fulfilled ("Thanks, your pizza will arrive in 20 minutes")
 function close(sessionAttributes, fulfillmentState, message) {
     return {
@@ -28,6 +38,16 @@ function dispatch(intentRequest, callback) {
             }
             break;
     
+        case "Guess":
+            if (slots.word === undefined || slots.word.length === 0) {
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a word (${slots.word}) !`}));
+            }   
+            else {
+                const word = slots.word.toLowerCase();
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the word ${word} (${slots.word})!`}));
+            }
+            break;
+
         default:
             console.log(`wrong intent - ${intent}`)
             callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Wrong intent`}));

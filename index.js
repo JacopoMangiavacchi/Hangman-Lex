@@ -23,7 +23,10 @@ function close(sessionAttributes, fulfillmentState, message) {
 function dispatch(intentRequest, callback) {
     console.log(`request received for userId=${intentRequest.userId}, intentName=${intentRequest.currentIntent.name}`);
 
-    const sessionAttributes = intentRequest.sessionAttributes;
+    let sessionAttributes = {};
+    if (intentRequest.sessionAttributes != null) {
+       sessionAttributes = intentRequest.sessionAttributes
+    }
     const slots = intentRequest.currentIntent.slots;
     const intent = intentRequest.currentIntent.name
     
@@ -34,6 +37,8 @@ function dispatch(intentRequest, callback) {
             }   
             else {
                 const letter = slots.letter.toLowerCase().substr(0, 1);
+                console.log(sessionAttributes)
+                sessionAttributes["lastLetter"] = letter
                 callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the letter ${letter} (${slots.letter})!`}));
             }
             break;
@@ -44,7 +49,8 @@ function dispatch(intentRequest, callback) {
             }   
             else {
                 const word = slots.word.toLowerCase();
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the word ${word} (${slots.word})!`}));
+                console.log(sessionAttributes)
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the word ${word} (${slots.word})! and last letter was ${sessionAttributes["lastLetter"]}`}));
             }
             break;
 
@@ -67,3 +73,60 @@ exports.handler = (event, context, callback) => {
         callback(err);
     }
 };
+
+function getSecret(callback) {
+    //var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=12&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
+    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&includePartOfSpeech=noun&excludePartOfSpeech=proper-noun&minCorpusCount=1&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=8&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
+
+    var request = require('request');
+    request(url, function (error, response, body) {
+        if (error !== null) {
+            console.log(`***** ERROR ***** getSecret (${error})`);
+            callback("");
+        }
+        else {
+            var jsonBody = [];
+
+            try {
+                jsonBody = JSON.parse(body);
+                var secret = jsonBody[0].word;
+                callback(secret);
+            }
+            catch (e) {
+                console.log(`***** ERROR CATCH ***** getSecret (${e}) (${jsonBody})`);
+                callback("");
+            }
+        }
+    });
+}
+
+function getDefinition(secret, callback) {
+    var url = `http://api.wordnik.com/v4/word.json/${secret}/definitions?api_key=${process.env.WORDNIK_APIKEY}`
+
+    var request = require('request');
+    request(url, function (error, response, body) {
+        if (error !== null) {
+            console.log(`***** ERROR ***** getDefinition (${error})`);
+            callback("");
+        }
+        else {
+            if (body.length <= 2) {
+                console.log(`WARNING no definition for (${secret})`);
+                callback("");
+            }
+            else {
+                var jsonBody = [];
+
+                try {
+                    jsonBody = JSON.parse(body);
+                    var definition = jsonBody[0].text;
+                    callback(definition);
+                }
+                catch (e) {
+                    console.log(`***** ERROR CATCH ***** getDefinition (${e}) (${jsonBody})`);
+                    callback("");
+                }
+            }
+        }
+    });
+}

@@ -17,8 +17,10 @@ function close(sessionAttributes, fulfillmentState, message) {
             type: 'Close',
             fulfillmentState,
             message,
-}, };
+        }
+    };
 }
+
 // --------------- Events -----------------------
 function dispatch(intentRequest, callback) {
     console.log(`request received for userId=${intentRequest.userId}, intentName=${intentRequest.currentIntent.name}`);
@@ -30,36 +32,31 @@ function dispatch(intentRequest, callback) {
     const slots = intentRequest.currentIntent.slots;
     const intent = intentRequest.currentIntent.name
     
-    switch (intent) {
-        case "TryLetter":
-            if (slots.letter === undefined || slots.letter.length === 0) {
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a letter (${slots.letter}) !`}));
-            }   
-            else {
-                const letter = slots.letter.toLowerCase().substr(0, 1);
-                console.log(sessionAttributes)
-                sessionAttributes["lastLetter"] = letter
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the letter ${letter} (${slots.letter})!`}));
-            }
-            break;
-    
-        case "Guess":
-            if (slots.word === undefined || slots.word.length === 0) {
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a word (${slots.word}) !`}));
-            }   
-            else {
-                const word = slots.word.toLowerCase();
-                console.log(sessionAttributes)
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the word ${word} (${slots.word})! and last letter was ${sessionAttributes["lastLetter"]}`}));
-            }
-            break;
+    let game = new HangmanGame.HangmanGame();
 
-        default:
-            console.log(`wrong intent - ${intent}`)
-            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Wrong intent`}));
-            break;
+    if (sessionAttributes['persistedGame'] == undefined) {
+        getSecret( (secret) => {
+            console.log(`secret = ${secret}`)
+            if (secret.length > 0) {
+                game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                sessionAttributes['persistedGame'] = game.saveToString();
+                console.log(`persistedGame = ${sessionAttributes['persistedGame']}`)
+
+                processIntent(intent, slots, game, sessionAttributes, callback);
+            }
+            else {
+                console.log(`Error: not able to generate a new secret word at the moment`)
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`}));
+            }
+        });
+    }
+    else {
+        game.loadFromString(sessionAttributes['persistedGame']);
+        processIntent(intent, slots, game, sessionAttributes, callback);
     }
 }
+
+
 // --------------- Main handler -----------------------
 // Route the incoming request based on intent.
 // The JSON body of the request is provided in the event slot.
@@ -73,6 +70,47 @@ exports.handler = (event, context, callback) => {
         callback(err);
     }
 };
+
+
+function processIntent(intent, slots, game, sessionAttributes, callback) {
+    switch (intent) {
+        case "Explain":
+            break;
+    
+        case "Point":
+            break;
+    
+        case "Surrender":
+            break;
+    
+        case "TryLetter":
+            if (slots.letter === undefined || slots.letter.length === 0) {
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a letter (${slots.letter}) !`}));
+            }   
+            else {
+                const letter = slots.letter.toLowerCase().substr(0, 1);
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the letter ${letter}.  The secret is (${game.secret})!`}));
+            }
+            break;
+    
+        case "Guess":
+            if (slots.word === undefined || slots.word.length === 0) {
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Naaah, you didn't provide a word (${slots.word}) !`}));
+            }   
+            else {
+                const word = slots.word.toLowerCase();
+                console.log(sessionAttributes)
+                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the word ${word} (${slots.word}) and The secret is (${game.secret})!`}));
+            }
+            break;
+
+        default:
+            console.log(`wrong intent - ${intent}`)
+            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Wrong intent`}));
+            break;
+    }
+}
+
 
 function getSecret(callback) {
     //var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=12&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
@@ -101,32 +139,31 @@ function getSecret(callback) {
 }
 
 function getDefinition(secret, callback) {
-    var url = `http://api.wordnik.com/v4/word.json/${secret}/definitions?api_key=${process.env.WORDNIK_APIKEY}`
+    let url = `http://api.wordnik.com/v4/word.json/${secret}/definitions?api_key=${process.env.WORDNIK_APIKEY}`
 
-    var request = require('request');
+    let request = require('request');
     request(url, function (error, response, body) {
+        let definition = ""
         if (error !== null) {
             console.log(`***** ERROR ***** getDefinition (${error})`);
-            callback("");
         }
         else {
             if (body.length <= 2) {
                 console.log(`WARNING no definition for (${secret})`);
-                callback("");
             }
             else {
-                var jsonBody = [];
+                let jsonBody = [];
 
                 try {
                     jsonBody = JSON.parse(body);
-                    var definition = jsonBody[0].text;
-                    callback(definition);
+                    definition = jsonBody[0].text;
                 }
                 catch (e) {
                     console.log(`***** ERROR CATCH ***** getDefinition (${e}) (${jsonBody})`);
-                    callback("");
                 }
             }
         }
+
+        callback(definition);
     });
 }

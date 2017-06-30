@@ -240,7 +240,7 @@ function getPoint(game) {
         else if (notPresentLetters.length > 0) {
             pointMessage += ` You already tried these other letters `;
 
-            for (i = 0; i < notPresentLetters.length; i++) { 
+            for (let i = 0; i < notPresentLetters.length; i++) { 
                 pointMessage += ` ${notPresentLetters.substr(i,1)} `;
             }
         }

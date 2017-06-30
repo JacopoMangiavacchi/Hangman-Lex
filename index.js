@@ -75,6 +75,14 @@ exports.handler = (event, context, callback) => {
 function processIntent(intent, slots, game, sessionAttributes, callback) {
     switch (intent) {
         case "Explain":
+            getDefinition(game.secret, (definition) => {
+                if (definition.length > 0) {
+                    callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `The definition of the secret word is "${definition}". Try to cach a new letter now`}));
+                }
+                else {
+                    callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Sorry, There is no definition available for this secret word.  You can continue anyway the game and try to cach a new letter now`}));
+                }
+            });
             break;
     
         case "Point":
@@ -114,27 +122,28 @@ function processIntent(intent, slots, game, sessionAttributes, callback) {
 
 function getSecret(callback) {
     //var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minCorpusCount=0&minLength=5&maxLength=12&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
-    var url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&includePartOfSpeech=noun&excludePartOfSpeech=proper-noun&minCorpusCount=1&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=8&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
+    let url = `http://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&includePartOfSpeech=noun&excludePartOfSpeech=proper-noun&minCorpusCount=1&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=8&limit=1&api_key=${process.env.WORDNIK_APIKEY}`
 
-    var request = require('request');
+    let request = require('request');
     request(url, function (error, response, body) {
+        let secret = ""
+
         if (error !== null) {
             console.log(`***** ERROR ***** getSecret (${error})`);
-            callback("");
         }
         else {
-            var jsonBody = [];
+            let jsonBody = [];
 
             try {
                 jsonBody = JSON.parse(body);
-                var secret = jsonBody[0].word;
-                callback(secret);
+                secret = jsonBody[0].word;
             }
             catch (e) {
                 console.log(`***** ERROR CATCH ***** getSecret (${e}) (${jsonBody})`);
-                callback("");
             }
         }
+
+        callback(secret);
     });
 }
 

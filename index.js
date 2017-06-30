@@ -86,6 +86,8 @@ function processIntent(intent, slots, game, sessionAttributes, callback) {
             break;
     
         case "Point":
+            let pointMessage = getPoint(game);
+            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': pointMessage}));
             break;
     
         case "Surrender":
@@ -175,4 +177,69 @@ function getDefinition(secret, callback) {
 
         callback(definition);
     });
+}
+
+
+function getPoint(game) {
+    let pointMessage = "";
+
+    if (game.lettersTried.length === 0) {
+        pointMessage = `This is a brand new game and you didn't tried any letters yet. The secret word is ${game.secret.length} characters length`;
+    }
+    else {
+        let discovered = game.discovered;
+        let discoveredLetters = discovered.replace(/_/g,"")
+
+        pointMessage = getDiscover(game);
+        pointMessage += ` You still need to discover ${(game.secret.length - discoveredLetters.length)} letters. `;
+
+        let notPresentLetters = game.lettersTried.split("").filter((letter) => discoveredLetters.indexOf(letter) == -1 ).join("");
+
+        // let notPresentLetters = "";
+        // for (i = 0; i < game.lettersTried.length; i++) {
+        //     let letter = game.lettersTried.substr(i,1);
+        //     if (discoveredLetters.indexOf(letter) == -1 ) {
+        //         notPresentLetters += letter;
+        //     }
+        // }
+
+        // console.log(`NOT_PRESENT_LETTERS: ${notPresentLetters}`);
+
+        if (notPresentLetters.length == 1) {
+            pointMessage += ` You already tried the letter ${notPresentLetters} `;
+        }
+        else if (notPresentLetters.length > 0) {
+            pointMessage += ` You already tried these other letters `;
+
+            for (i = 0; i < notPresentLetters.length; i++) { 
+                pointMessage += ` ${notPresentLetters.substr(i,1)} `;
+            }
+        }
+    }
+
+    return pointMessage;
+}
+
+
+function getDiscover(game) {
+    let discoverMessage = "";
+    let discovered = game.discovered;
+    let discoveredLetters = discovered.replace(/_/g,"")
+
+    // console.log(`SECRET: ${game.secret}`);
+    // console.log(`DISCOVERED: ${discovered}`);
+    // console.log(`DISCOVERED_LETTERS: ${discoveredLetters}`);
+
+    if (discoveredLetters.length > 0) {
+        discoverMessage = `The currently discovered word is `
+        for (i = 0; i < discovered.length; i++) { 
+            discoverMessage += `${discovered.substr(i,1)} `;
+        }
+        discoverMessage += ` and is ${game.secret.length} letters length.`;
+    }
+    else {
+        discoverMessage = `The currently discovered word is ${game.secret.length} letters length.`;
+    }
+
+    return discoverMessage
 }

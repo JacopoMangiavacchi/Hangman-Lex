@@ -111,7 +111,24 @@ function processIntent(intent, slots, game, sessionAttributes, callback) {
             }   
             else {
                 const letter = slots.letter.toLowerCase().substr(0, 1);
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the letter ${letter}.  The secret is (${game.secret})!`}));
+                const result = handleTryLetter(letter, game);
+
+                if (result.endOfGame === true) {
+                    getSecret( (secret) => {
+                        if (secret.length > 0) {
+                            game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                            sessionAttributes['persistedGame'] = game.saveToString();
+                            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': result.speechOutput}));
+                        }
+                        else {
+                            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`}));
+                        }
+                    });
+                }
+                else {
+                    sessionAttributes['persistedGame'] = game.saveToString();
+                    callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': result.speechOutput}));
+                }
             }
             break;
     
@@ -244,7 +261,7 @@ function getDiscover(game) {
 
     if (discoveredLetters.length > 0) {
         discoverMessage = `The currently discovered word is `
-        for (i = 0; i < discovered.length; i++) { 
+        for (let i = 0; i < discovered.length; i++) { 
             discoverMessage += `${discovered.substr(i,1)} `;
         }
         discoverMessage += ` and is ${game.secret.length} letters length.`;
@@ -254,4 +271,49 @@ function getDiscover(game) {
     }
 
     return discoverMessage
+}
+
+
+function handleTryLetter(letter, game) {
+    let speechOutput = "";
+    let endOfGame = false;
+
+    switch (game.tryLetter(letter)) {
+        case HangmanGame.tryLetterResult.won:
+            speechOutput = `You won. The secret word was ${game.secret}. Try to catch a new word now. Please try a letter`;
+            endOfGame = true;
+            break;
+    
+        case HangmanGame.tryLetterResult.lost:
+            speechOutput = `Sorry you lost. The secret word was ${game.secret}. Try to catch a new word now. Please try a letter`;
+            endOfGame = true;
+            break;
+    
+        case HangmanGame.tryLetterResult.alreadyTried:
+            speechOutput = `You already tried the letter ${letter}. Please try a new one`;
+            break;
+    
+        case HangmanGame.tryLetterResult.found:
+            speechOutput = `The secret word contain the letter ${letter}. `  
+            speechOutput += getDiscover(game);
+            speechOutput += `  Try to cach a new letter now.`;
+            break;
+    
+        case HangmanGame.tryLetterResult.notFound:
+            speechOutput = `Sorry, the secret word didn't contain the letter ${letter}. `;
+            if (game.failedAttempts == maxNumberOfTry - 2) {
+                speechOutput += `Watch out, you only have two more tentatives. `;
+            }
+            else if (game.failedAttempts == maxNumberOfTry - 1) {
+                speechOutput += `Watch out, you only have one last tentative. `;
+            }
+            speechOutput += `Please try a new letter.`;
+            break;
+    
+        default:
+            speechOutput = "Error on TryLetter";
+            break;
+    }
+
+    return {speechOutput: speechOutput, endOfGame: endOfGame};
 }

@@ -138,8 +138,22 @@ function processIntent(intent, slots, game, sessionAttributes, callback) {
             }   
             else {
                 const word = slots.word.toLowerCase();
-                console.log(sessionAttributes)
-                callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Okay, You asked the word ${word} (${slots.word}) and The secret is (${game.secret})!`}));
+
+                if (word === game.secret) {
+                    getSecret( (secret) => {
+                        if (secret.length > 0) {
+                            game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                            sessionAttributes['persistedGame'] = game.saveToString();
+                            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `You won. The secret word was ${word}. Try to catch a new word now. Please try a letter.`}));
+                        }
+                        else {
+                            callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `You won. The secret word was ${word}. I am deeply sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`}));
+                        }
+                    });
+                }
+                else {
+                    callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `Nope. The secret word is not ${word}. Please try a new letter or another word.`}));
+                }
             }
             break;
 

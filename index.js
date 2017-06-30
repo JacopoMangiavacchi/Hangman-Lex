@@ -91,6 +91,18 @@ function processIntent(intent, slots, game, sessionAttributes, callback) {
             break;
     
         case "Surrender":
+            var oldSecret = game.secret
+            //console.log(`The secret word was ${oldSecret}`)
+            getSecret( (secret) => {
+                if (secret.length > 0) {
+                    game = new HangmanGame.HangmanGame(secret, maxNumberOfTry);
+                    sessionAttributes['persistedGame'] = game.saveToString();
+                    callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `The secret word was ${oldSecret}. I guessed a new word and started a new game.  Please try to cach a new letter now.`}));
+                }
+                else {
+                    callback(close(sessionAttributes, 'Fulfilled', {'contentType': 'PlainText', 'content': `The secret word was ${oldSecret}. I am sorry, I am not able to generate a new secret word at the moment. Please retry in a bit.`}));
+                }
+            });
             break;
     
         case "TryLetter":
